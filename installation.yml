@@ -89,6 +89,7 @@
     - apigee-component
 
   - name: Configure edgemicro
+    become: true
     delegate_to: '{{ inventory_hostname }}'
     shell: edgemicro private configure -m http://{{ local_mgmt_ip }}:8080 -r http://{{ router_ip }}:9001 -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
     args:
