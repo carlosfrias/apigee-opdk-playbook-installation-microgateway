@@ -82,17 +82,34 @@
     tags:
     - apigee-pre-req
 
-  - name: Get router public IP address
-    set_fact:
-      router_ip: "{{ hostvars[groups['rmp'][0]]['public_address'] }}"
-    tags:
-    - apigee-component
+  - block:
 
-  - name: Configure edgemicro
-    become: true
-    delegate_to: '{{ inventory_hostname }}'
-    shell: edgemicro private configure -m http://{{ local_mgmt_ip }}:8080 -r http://{{ router_ip }}:9001 -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
-    args:
-      chdir: '~'
-    tags:
-    - apigee-component
+    - name: Get router public IP address
+      set_fact:
+        router_ip: "{{ hostvars[groups['rmp'][0]]['public_address'] }}"
+      tags:
+      - apigee-component
+
+    - name: Configure edgemicro on private
+      become: true
+      delegate_to: '{{ inventory_hostname }}'
+      shell: edgemicro private configure -m http://{{ local_mgmt_ip }}:8080 -r http://{{ router_ip }}:9001 -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
+      args:
+        chdir: '~'
+      tags:
+      - apigee-component
+    # TODO: This when clause needs to be tested.
+    when: edgemicro_private is defined and edgemicro_private | bool
+
+  - block:
+#  TODO: This block needs to be tested
+    - name: Configure edgemicro on private
+      become: true
+      delegate_to: '{{ inventory_hostname }}'
+      shell: edgemicro configure -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
+      args:
+        chdir: '~'
+      tags:
+      - apigee-component
+
+    when: edgemicro_private is not defined or not edgemicro_private | bool
