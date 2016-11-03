@@ -1,0 +1,83 @@
+---
+- hosts: micro
+  vars:
+    config_output: '/tmp/edgemicro_config_output.txt'
+  vars_files:
+  - ~/.apigee/credentials.yml
+  roles:
+  - apigee-opdk-setup-default-settings
+  tasks:
+
+  - name: Init edgemicro
+    become: no
+    shell: 'edgemicro init'
+    args:
+      chdir: '~'
+    tags:
+    - apigee-pre-req
+
+  - block:
+
+    - name: Get router public IP address
+      set_fact:
+        router_ip: "{{ hostvars[groups['rmp'][0]]['public_address'] }}"
+      tags:
+      - apigee-component
+
+    - name: Configure edgemicro on private
+      become: no
+      delegate_to: '{{ inventory_hostname }}'
+      shell: edgemicro private configure -m http://{{ local_mgmt_ip }}:8080 -r http://{{ router_ip }}:9001 -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
+      args:
+        chdir: '~'
+      tags:
+      - apigee-component
+      register: config_private
+    when: edgemicro_private is defined and edgemicro_private | bool
+
+  - block:
+#  TODO: This block needs to be tested
+    - name: Configure edgemicro on private
+      become: no
+      delegate_to: '{{ inventory_hostname }}'
+      shell: edgemicro configure -o {{ org_name }} -e {{ env_name }} -u {{ opdk_user_email }} -p {{ opdk_user_pass }} -v default
+      args:
+        chdir: '~'
+      tags:
+      - apigee-component
+      register: config_public
+
+    when: edgemicro_private is not defined or not edgemicro_private | bool
+
+  - name: Report config data
+    debug:
+      var: config_private.stdout_lines
+
+  - copy :
+      content: "{{ config_private.stdout }}"
+      dest: '{{ config_output }}'
+
+  - name: Capture key
+    shell: "awk '/key:/ { print $2  }' {{ config_output }}"
+    register: key
+
+  - name: Capture secret
+    shell: "awk '/secret:/ { print $2  }' {{ config_output }}"
+    register: secret
+
+  - name: Cache edgemicro key
+    cache:
+      key: 'edgemicro_key'
+      value: '{{ key.stdout }}'
+
+  - name: Cache edgemicro secret
+    cache:
+      key: 'edgemicro_secret'
+      value: '{{ secret.stdout }}'
+
+  - name: Start edgemicro
+    shell: edgemicro start -o {{ org_name }} -e {{ env_name }} -k {{ edgemicro_key }} -s {{ edgemicro_secret }}
+    args:
+      chdir: '~'
+    async: 5
+    poll: 0

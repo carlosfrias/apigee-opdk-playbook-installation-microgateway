@@ -1,0 +1,10 @@
+---
+- hosts: planet,micro
+  vars_files:
+  - ~/.apigee/credentials.yml
+  roles:
+  - apigee-opdk-setup-default-settings
+  tags:
+  - cache
+  - os-pre-req
+  - apigee-pre-req
