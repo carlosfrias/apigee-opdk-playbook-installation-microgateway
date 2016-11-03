@@ -7,7 +7,6 @@
   - apigee-opdk-setup-os-minimum
   - apigee-opdk-setup-os-common
 
-
   tasks:
   - name: Install needed Python used for downloading files with https
     pip:

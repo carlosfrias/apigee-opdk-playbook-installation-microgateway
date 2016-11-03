@@ -36,7 +36,7 @@
     when: edgemicro_private is defined and edgemicro_private | bool
 
   - block:
-#  TODO: This block needs to be tested
+    #  TODO: This block needs to be tested
     - name: Configure edgemicro on private
       become: no
       delegate_to: '{{ inventory_hostname }}'
