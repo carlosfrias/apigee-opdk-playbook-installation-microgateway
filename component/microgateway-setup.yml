@@ -1,5 +1,6 @@
 ---
 - hosts: micro
+  gather_facts: no
   vars:
     config_output: '/tmp/edgemicro_config_output.txt'
   tasks:

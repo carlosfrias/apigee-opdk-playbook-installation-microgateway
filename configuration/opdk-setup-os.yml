@@ -1,6 +1,7 @@
 ---
 - hosts: micro
   become: yes
+  gather_facts: no
   vars_files:
   - ~/.apigee/credentials.yml
   roles:
