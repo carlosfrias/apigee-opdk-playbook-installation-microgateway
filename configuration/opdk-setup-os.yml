@@ -4,8 +4,8 @@
   vars_files:
   - ~/.apigee/credentials.yml
   roles:
-  - apigee-opdk-setup-os-minimum
-  - apigee-opdk-setup-os-common
+  - { role: apigee-opdk-setup-os-minimum, tags: ['os-pre-req'] }
+  - { role: apigee-opdk-setup-os-common, tags: ['os-pre-req'] }
 
   tasks:
   - name: Install needed Python used for downloading files with https
@@ -55,4 +55,4 @@
     with_items:
     - { name: edgemicro, version: '2.1.1' }
     tags:
-    - os-pre-req
+    - apigee-pre-req
