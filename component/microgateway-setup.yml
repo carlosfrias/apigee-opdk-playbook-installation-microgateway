@@ -2,10 +2,6 @@
 - hosts: micro
   vars:
     config_output: '/tmp/edgemicro_config_output.txt'
-  vars_files:
-  - ~/.apigee/credentials.yml
-  roles:
-  - apigee-opdk-setup-default-settings
   tasks:
 
   - name: Init edgemicro

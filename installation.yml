@@ -1,6 +1,6 @@
 ---
-- include: configuration/update-cache.yml
+- name: Configure OS for microgateway
+  include: configuration/opdk-setup-os.yml
 
-- include: configuration/opdk-setup-os.yml
-
-- include: component/microgateway-setup.yml
+- name: Install and configure microgateway
+  include: component/microgateway-setup.yml

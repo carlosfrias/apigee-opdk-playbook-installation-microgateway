@@ -4,6 +4,7 @@
   vars_files:
   - ~/.apigee/credentials.yml
   roles:
+  - { role: apigee-opdk-setup-default-settings, tags: ['cache'] }
   - { role: apigee-opdk-setup-os-minimum, tags: ['os-pre-req'] }
   - { role: apigee-opdk-setup-os-common, tags: ['os-pre-req'] }
 
